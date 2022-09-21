@@ -1,0 +1,150 @@
+<div class="modal-header">
+  <h4 *ngIf="mode==='CREATE'" class="modal-title">Créer nouvel utilisateur</h4>
+  <h4 *ngIf="mode==='UPDATE'" class="modal-title text-dark">Modifier les informations de utilisateur</h4>
+  <button type="button" class="close" aria-label="Close" (click)="close()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <form [formGroup]="form" class="was-validated">
+    <div class="form-row">
+      <div class="form-group col-md-12">
+        <label class="form-col-form-label" for="name">Nom</label>
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text">
+              <i class="fa fa-user"></i>
+            </span>
+          </div>
+          <input formControlName="name" type="text" class="form-control" id="name" required>
+          <div class="invalid-feedback">
+            Veuillez saisir le nom
+          </div>
+        </div>
+      </div>    
+      <div class="form-group col-md-12">
+        <label class="form-col-form-label" for="user_name">Login</label>
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text">
+              <i class="fa fa-user"></i>
+            </span>
+          </div>
+          <input formControlName="username" type="text" class="form-control" id="user_name" required>
+          <div class="invalid-feedback">
+            Veuillez saisir le nom d'utilisateur
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="mode==='CREATE'" class="form-group col-md-6">
+        <label class="form-col-form-label" for="user_password">Mot de passe</label>
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text">
+              <i class="fa fa-lock"></i>
+            </span>
+          </div>
+          <input formControlName="password" [type]="togglePasswordOptions?.passwordType" class="form-control" id="user_password" autocomplete="password" required>
+          <div
+          class="input-group-append"
+          (click)="toggleViewPasswordBtn()">
+            <span class="input-group-text"><i class="fa {{ togglePasswordOptions?.passwordType === 'password'? 'fa-eye': 'fa-eye-slash' }}"></i></span>
+          </div>
+          <div class="invalid-feedback">
+            Veuillez saisir le mot de passe
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="mode==='CREATE'" class="form-group col-md-6">
+        <label class="form-col-form-label" for="user_confirm_password">Saisir à nouveau le mot de passe</label>
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text">
+              <i class="fa fa-lock"></i>
+            </span>
+          </div>
+          <input formControlName="confirmPassword" [type]="togglePasswordOptions?.confirmPasswordType" class="form-control" id="user_confirm_password" autocomplete="confirm-password" required>
+          <div
+            class="input-group-append"
+            (click)="toggleViewConfirmPasswordBtn()">
+            <span class="input-group-text"><i class="fa {{ togglePasswordOptions?.confirmPasswordType === 'password'? 'fa-eye': 'fa-eye-slash' }}"></i></span>
+          </div>
+          <div class="invalid-feedback">
+            Veuillez confirmer le mot de passe
+          </div>
+        </div>
+        <div *ngIf="errorMessages">
+          <div *ngFor="let error of errorMessages?.confirmPassword" class="ng-container">
+            <ng-container *ngIf="f.confirmPassword.hasError(error?.type) && (f.confirmPassword.dirty || f.confirmPassword.touched)">
+              <small class="error-message">{{ error?.message }}</small>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group col-md-6">
+          <label class="form-col-form-label" for="user_email">Email</label>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text">
+                <i class="fa fa-envelope"></i>
+              </span>
+            </div>
+            <input formControlName="userEmail" type="email" class="form-control" id="user_email" autocomplete="email" required>
+            <div class="invalid-feedback">
+              Veuillez saisir l'addresse email
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group col-md-6">
+            <label class="form-col-form-label" for="user_email">Rôle</label>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">
+                  <i class="fa fa-user-plus"></i>
+                </span>
+              </div>
+              <select formControlName="userRole" id="user_role" required class="form-control">
+                <option value="USER">USER</option>
+                <option value="MANAGER">MANAGER</option>
+                <option value="ADMIN">ADMINISTRATOR</option>
+              </select>
+              <div class="invalid-feedback">
+                Veuillez choisir un rôle
+              </div>
+            </div>
+          </div>
+
+    </div>
+  </form>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary btn-brand" (click)="close()">
+    <i class="fa fa-times"></i>
+    <span>Annuler</span>
+  </button>
+  <button
+    *ngIf="mode==='CREATE'"
+    type="button"
+    class="btn btn-primary btn-brand"
+    (click)="create()"
+    [disabled]="form.invalid || isLoading">
+    <i *ngIf="isLoading"><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span></i>
+    <i *ngIf="!isLoading" class="fa fa-plus"></i>
+    <span>Créer</span>
+  </button>
+  <button
+    *ngIf="mode==='UPDATE'"
+    type="button"
+    class="btn btn-primary btn-brand"
+    (click)="update()"
+    [disabled]="form.invalid || isLoading">
+    <i *ngIf="isLoading"><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span></i>
+    <i *ngIf="!isLoading" class="fa fa-save"></i>
+    <span>Enregistrer</span>
+  </button>
+</div>
+

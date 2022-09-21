@@ -1,0 +1,173 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="card main-card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-sm-3">
+            <h4 class="card-title mb-0">Liste des utilisateurs</h4>
+            <div class="small text-muted">{{ currentDate }}</div>
+          </div>
+          <!--/.col-->
+          <div class="col-sm-9 d-none d-md-block">
+            <!--<button *ngIf="authService.hasAnyPermission(['CREATE_USER'])" type="button"
+              class="btn btn-brand btn-primary float-right" (click)="create()">
+              <i class="fa fa-plus"></i>
+              <span>Créer un nouveau</span>
+            </button>-->
+          <button type="button"
+          class="btn btn-brand btn-primary float-right" (click)="create()">
+          <i class="fa fa-plus"></i>
+          <span>Créer un nouveau</span>
+        </button>
+
+            <!--<div *ngIf="authService.hasAnyPermission(['SEARCH_USER'])" class="input-group w-50 float-right mr-3">-->
+            <div class="input-group w-50 float-right mr-3">
+              <div class="input-group-prepend">
+                <button type="button" class="btn btn-primary">
+                  <i class="fa fa-search"></i>
+                  Search
+                </button>
+              </div>
+              <input type="text" (input)="startSearch($event)" id="input1-group1" name="input1-group1"
+                placeholder="rechercher..." class="form-control">
+            </div>
+          </div>
+          <!--/.col-->
+          <div class="col-sm-9 d-md-none d-lg-none d-sm-block mt-3">
+            <div class="input-group mr-3">
+            <!--<div *ngIf="authService.hasAnyPermission(['SEARCH_USER'])" class="input-group mr-3">-->
+              <div class="input-group-prepend">
+                <button type="button" class="btn btn-primary">
+                  <i class="fa fa-search"></i>
+                  Search
+                </button>
+              </div>
+              <input type="text" (input)="startSearch($event)" id="input1-group2" name="input1-group2"
+                placeholder="rechercher..." class="form-control">
+            </div>
+
+            <div class="text-center">
+              <button type="button" class="btn btn-brand btn-primary mt-3" (click)="create()">
+                <i class="fa fa-plus"></i>
+                <span>Créer un nouveau</span>
+              </button>
+            </div>
+
+          </div>
+          <!--/.col-->
+        </div>
+        <!--/.row-->
+        <br>
+        <table class="table table-responsive-sm table-hover table-bordered  mb-0">
+          <thead class="thead-light">
+            <tr>
+              <th class="text-center"><i class="icon-people"></i></th>
+              <th>Nom</th>
+              <th>Login</th>
+              <th>Email</th>
+              <th class="text-center">Statut</th>
+              <th class="text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of users">
+              <td class="text-center" style="width: 10%;">
+                <div class="avatar">
+                  <img src="assets/img/avatars/1.png" class="img-avatar" alt="admin@bootstrapmaster.com">
+                  <span class="avatar-status badge-success"></span>
+                </div>
+              </td>
+              <td style="width: 20%;">
+                <div class="text-bold">{{ item?.name }}</div>
+                <div class="small text-muted">
+                  <span>Date création</span> : {{ displayDate(item?.createdOn) }}
+                </div>
+              </td>
+              <!--td style="width: 20%;">
+                <div class="text-bold">{{ item?.userRole }}</div>
+              </td-->
+              <td style="width: 20%;">
+                <div class="text-bold">{{ item?.username }}</div>
+              </td>
+              <td class="text-bold" style="width: 20%;">
+                <div *ngIf="item.userEmail">{{ item?.userEmail }}</div>
+                <div *ngIf="!item.userEmail"><i class="fa fa-ban text-danger fa-lg"></i></div>
+              </td>
+              <td class="text-center" style="width: 12.5%;">
+                <div class="btn-group" dropdown>
+                  <button type="button" dropdownToggle tooltip="Modifier le status" placement="top"
+                    class="btn btn-sm {{ item?.status === state?.STATE_DEACTIVATED? 'btn-secondary': 'btn-success'}} dropdown-toggle dropdown-toggle-split">
+                    <span class="caret"></span>
+                    <span class="sr-only">Split button!</span>
+                  </button>
+                  <button type="button"
+                    tooltip="Statut {{ item?.status === state?.STATE_DEACTIVATED? 'Inactif': 'Actif' }}" placement="top"
+                    class="btn btn-sm {{ item?.status === state?.STATE_DEACTIVATED? 'btn-secondary': 'btn-success'}}">
+                    {{ item?.status === state?.STATE_DEACTIVATED? 'Inactif': 'Actif' }}
+                  </button>
+                  <ul *dropdownMenu class="dropdown-menu" role="menu">
+                    <li
+                      *ngIf="item?.status === state?.STATE_ACTIVATED  && item?.userId !== currentUser?.userId"
+                      role="menuitem">
+                      <span class="badge badge-secondary dropdown-item" (click)="desactivate(item)">Désactiver</span>
+                    </li>
+                    <li
+                      *ngIf="item?.status === state?.STATE_DEACTIVATED && item?.userId !== currentUser?.userId"
+                      role="menuitem">
+                      <span class="badge badge-success dropdown-item" (click)="activate(item)">Activer</span>
+                    </li>
+                  </ul>
+                </div>
+              </td>
+              <td class="text-center" style="width: 12.5%;">
+                <div class="btn-group" dropdown>
+                  <button type="button" dropdownToggle tooltip="Effectuer une action" placement="top"
+                    class="btn btn-sm btn-success dropdown-toggle dropdown-toggle-split">
+                    <span class="caret"></span>
+                    <span class="sr-only">Split button!</span>
+                  </button>
+                  <button type="button" class="btn btn-sm btn-success">
+                    <i class="fa fa-cog"></i>
+                  </button>
+                  <ul *dropdownMenu class="dropdown-menu dropdown-menu-left" role="menu">
+                    <li 
+                      role="menuitem">
+                      <span class="badge badge-danger dropdown-item" (click)="delete(item)" tooltip="Supprimer"
+                        placement="top">
+                        <i class="fa fa-trash text-light"></i>
+                        <span>Suprimer la ligne</span>
+                      </span>
+                    </li>
+                    <li  role="menuitem">
+                      <span class="badge badge-secondary dropdown-item" tooltip="Modifier les informations"
+                        placement="top" (click)="update(item)">
+                        <i class="fa fa-pencil text-dark"></i>
+                        <span>Modifier la ligne</span>
+                      </span>
+                    </li>
+                  </ul>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="isLoading">
+              <td colspan="8">
+                <div class="text-center">
+                  <div class="spinner-border" role="status">
+                    <span class="sr-only">Loading...</span>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="!isLoading && users.length === 0">
+              <td colspan="8">
+                <div class="text-center">
+                  <span class="text-primary">Liste vide</span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

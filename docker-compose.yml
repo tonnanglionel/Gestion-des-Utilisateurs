@@ -1,0 +1,70 @@
+# Docker compose file to deploy POC.
+version: '3.4'
+
+services:
+  proxy:
+    depends_on:
+      - backend
+      - frontend
+    image: proxy
+    build:
+      context: ./Proxy
+      dockerfile: ./Dockerfile
+    ports:
+      - "80:80"
+    networks:
+      proxynet:
+        ipv4_address: 192.168.108.2
+      
+  frontend:
+    image: frontend
+    build:
+      context: ./frontend
+      dockerfile: ./Dockerfile
+      args:
+        SCRIPT_TO_RUN: build_docker
+    networks:
+      proxynet:
+        ipv4_address: 192.168.108.3
+
+  backend-mysql:
+    image: mysql:5.7
+    #Uncomment and edit to persist db data
+    #volumes:
+    #  - G:\Workspace\Tests\tp-rp-docker-data\mysql:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: db_proof_concept1
+      MYSQL_USER: poc_db_user
+      MYSQL_PASSWORD: Pass.gh956
+      MYSQL_ROOT_PASSWORD: Pass.gh956
+      MYSQL_TCP_PORT: 3308
+    expose:
+      - 3308
+    networks:
+      proxynet:
+        ipv4_address: 192.168.108.4
+
+  backend:
+    depends_on:
+      - backend-mysql
+    image: backend
+    build:
+      context: ./backend
+      dockerfile: ./Dockerfile
+      args:
+        MVN_PROFILE: docker
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    networks:
+      proxynet:
+        ipv4_address: 192.168.108.5
+  
+networks:
+  proxynet:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.108.0/24
+  
